@@ -2,10 +2,12 @@ import { Product, UnregisteredProduct } from "./products.js";
 import { Router } from "express";
 import { prisma } from "../prisma/prisma.js";
 import { BadRequestError, NotFoundError } from "../errors/customErrors.js";
-import { ProductComment } from "./comment.js";
-const ProductRouter = new Router();
+import productCommentRouter from "./product-comment.route.js";
+import productImageRouter from "./product-image.route.js";
 
-const ProductCommentRouter = new Router({ mergeParams: true });
+const productRouter = new Router();
+
+productRouter.use("/:productId/image", productImageRouter);
 productRouter.use("/:productId/comments", productCommentRouter);
 
 // ### 댓글

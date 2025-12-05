@@ -4,7 +4,7 @@
 
 import { DESTRUCTION } from "dns";
 import { describe } from "node:test";
-import { native } from "pg";
+import { Pool } from "pg";
 
 export class Product {
   constructor(id, name, description, price, tags, createdAt, updatedAt) {
@@ -105,7 +105,6 @@ function validateUpdatedAt(updatedat) {
     throw new Error(`Invalid updatedAt ${updatedat.toString()}`);
   }
 }
-(description, price, tags, createdAt, updatedAt);
 
 function validateProductInfo({
   id,
