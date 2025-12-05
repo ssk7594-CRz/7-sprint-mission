@@ -28,3 +28,4 @@ Thumbs.db
 
 # VS Code 설정
 .vscode
+/generated/prisma
