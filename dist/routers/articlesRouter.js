@@ -1,0 +1,20 @@
+"use strict";
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+const express_1 = __importDefault(require("express"));
+const withAsync_1 = require("../lib/withAsync");
+const articlesController_1 = require("../controllers/articlesController");
+const authenticate_1 = __importDefault(require("../middlewares/authenticate"));
+const articlesRouter = express_1.default.Router();
+articlesRouter.post('/', (0, authenticate_1.default)(), (0, withAsync_1.withAsync)(articlesController_1.createArticle));
+articlesRouter.get('/', (0, authenticate_1.default)({ optional: true }), (0, withAsync_1.withAsync)(articlesController_1.getArticleList));
+articlesRouter.get('/:id', (0, authenticate_1.default)({ optional: true }), (0, withAsync_1.withAsync)(articlesController_1.getArticle));
+articlesRouter.patch('/:id', (0, authenticate_1.default)(), (0, withAsync_1.withAsync)(articlesController_1.updateArticle));
+articlesRouter.delete('/:id', (0, authenticate_1.default)(), (0, withAsync_1.withAsync)(articlesController_1.deleteArticle));
+articlesRouter.post('/:id/comments', (0, authenticate_1.default)(), (0, withAsync_1.withAsync)(articlesController_1.createComment));
+articlesRouter.get('/:id/comments', (0, withAsync_1.withAsync)(articlesController_1.getCommentList));
+articlesRouter.post('/:id/likes', (0, authenticate_1.default)(), (0, withAsync_1.withAsync)(articlesController_1.createLike));
+articlesRouter.delete('/:id/likes', (0, authenticate_1.default)(), (0, withAsync_1.withAsync)(articlesController_1.deleteLike));
+exports.default = articlesRouter;
