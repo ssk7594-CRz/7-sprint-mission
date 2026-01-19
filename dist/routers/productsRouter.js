@@ -1,0 +1,20 @@
+"use strict";
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+const express_1 = __importDefault(require("express"));
+const withAsync_1 = require("../lib/withAsync");
+const productsController_1 = require("../controllers/productsController");
+const authenticate_1 = __importDefault(require("../middlewares/authenticate"));
+const productsRouter = express_1.default.Router();
+productsRouter.post('/', (0, authenticate_1.default)(), (0, withAsync_1.withAsync)(productsController_1.createProduct));
+productsRouter.get('/:id', (0, authenticate_1.default)({ optional: true }), (0, withAsync_1.withAsync)(productsController_1.getProduct));
+productsRouter.patch('/:id', (0, authenticate_1.default)(), (0, withAsync_1.withAsync)(productsController_1.updateProduct));
+productsRouter.delete('/:id', (0, authenticate_1.default)(), (0, withAsync_1.withAsync)(productsController_1.deleteProduct));
+productsRouter.get('/', (0, authenticate_1.default)({ optional: true }), (0, withAsync_1.withAsync)(productsController_1.getProductList));
+productsRouter.post('/:id/comments', (0, authenticate_1.default)(), (0, withAsync_1.withAsync)(productsController_1.createComment));
+productsRouter.get('/:id/comments', (0, withAsync_1.withAsync)(productsController_1.getCommentList));
+productsRouter.post('/:id/favorites', (0, authenticate_1.default)(), (0, withAsync_1.withAsync)(productsController_1.createFavorite));
+productsRouter.delete('/:id/favorites', (0, authenticate_1.default)(), (0, withAsync_1.withAsync)(productsController_1.deleteFavorite));
+exports.default = productsRouter;
