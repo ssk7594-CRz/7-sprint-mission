@@ -1,0 +1,14 @@
+{
+  "scripts": {
+    "build": "tsc",
+    "start": "node ./build/main.js"
+  },
+  "devDependencies": {
+    "@prisma/client": "^6.19.1",
+    "prisma": "^6.19.1",
+    "typescript": "^5.9.3"
+  },
+  "dependencies": {
+    "bcrypt": "^6.0.0"
+  }
+}
