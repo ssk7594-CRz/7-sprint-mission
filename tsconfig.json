@@ -1,44 +1,41 @@
 {
-  // Visit https://aka.ms/tsconfig to read more about this file
   "compilerOptions": {
-    // File Layout
+    /* 📂 File Layout */
     "rootDir": "./src",
     "outDir": "./dist",
+    "baseUrl": ".",
+    /* 경로 인식을 위해 paths 설정 최적화 */
+    "paths": {
+      "*": ["node_modules/*", "src/*"]
+    },
+    
+    /* 🌍 Environment Settings (Node.js 실행 환경에 최적화) */
+    "target": "ES6",
+    "module": "CommonJS",            /* 👈 ESNext에서 CommonJS로 변경 (임포트 에러 해결 핵심) */
+    "moduleResolution": "node",      /* 👈 Bundler에서 node로 변경 (파일 찾기 해결 핵심) */
+    "lib": ["ESNext"],
 
-    // Environment Settings
-    // See also https://aka.ms/tsconfig/module
-    "module": "nodenext",
-    "target": "esnext",
-    "types": [],
-    // For nodejs:
-    // "lib": ["esnext"],
-    // "types": ["node"],
-    // and npm install -D @types/node
-
-    // Other Outputs
-    "sourceMap": true,
-    "declaration": true,
-    "declarationMap": true,
-
-    // Stricter Typechecking Options
-    "noUncheckedIndexedAccess": true,
-    "exactOptionalPropertyTypes": true,
-
-    // Style Options
-    // "noImplicitReturns": true,
-    // "noImplicitOverride": true,
-    // "noUnusedLocals": true,
-    // "noUnusedParameters": true,
-    // "noFallthroughCasesInSwitch": true,
-    // "noPropertyAccessFromIndexSignature": true,
-
-    // Recommended Options
+    /* 🛡️ Strict Mode */
     "strict": true,
-    "jsx": "react-jsx",
-    "verbatimModuleSyntax": true,
+    "noImplicitAny": true,
+    "strictNullChecks": true,
+    "noUnusedLocals": false,         /* 개발 중 편의를 위해 잠시 false (선택 사항) */
+    "noUnusedParameters": false,     /* 개발 중 편의를 위해 잠시 false (선택 사항) */
+    "noImplicitReturns": false,
+    "noFallthroughCasesInSwitch": true,
+
+    /* ⚡️ Interop & Others */
+    "esModuleInterop": true,         /* import React from 'react' 같은 구문 허용 */
+    "allowSyntheticDefaultImports": true,
+    "forceConsistentCasingInFileNames": true,
+    "skipLibCheck": true,            /* @types 라이브러리 내부 에러 무시 (속도 향상) */
     "isolatedModules": true,
-    "noUncheckedSideEffectImports": true,
-    "moduleDetection": "force",
-    "skipLibCheck": true,
-  }
+    "resolveJsonModule": true,
+
+    /* 🛠️ Debugging */
+    "sourceMap": true,
+    "declaration": true
+  },
+  "include": ["src/**/*", "tests/**/*"],
+  "exclude": ["node_modules", "dist"]
 }

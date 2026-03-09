@@ -1,0 +1,125 @@
+/**
+ * socket.ts 유닛 테스트
+ * socket.io Server를 Mock하여 소켓 로직 검증
+ */
+
+// ── socket.io Mock ───────────────────────────────────────────────
+const mockEmit    = jest.fn();
+const mockJoin    = jest.fn();
+const mockTo      = jest.fn().mockReturnValue({ emit: mockEmit });
+const mockOn      = jest.fn();
+
+const mockSocket = {
+  id: 'socket-test-id',
+  join: mockJoin,
+  on:   mockOn,
+};
+
+const mockIo = {
+  on:   jest.fn(),
+  to:   mockTo,
+  emit: mockEmit,
+};
+
+jest.mock('socket.io', () => ({
+  Server: jest.fn().mockImplementation(() => mockIo),
+}));
+
+import { Server } from 'socket.io';
+import { setupSocket, emitNotification } from '../src/socket/socket';
+import http from 'http';
+
+beforeEach(() => jest.clearAllMocks());
+
+// ══════════════════════════════════════════════════════════════════
+describe('[Unit] setupSocket', () => {
+// ══════════════════════════════════════════════════════════════════
+
+  it('setupSocket 호출 → socket.io Server 생성 + io 반환', () => {
+    const httpServer = http.createServer();
+    const io = setupSocket(httpServer);
+
+    expect(Server).toHaveBeenCalledWith(
+      httpServer,
+      expect.objectContaining({
+        cors: expect.objectContaining({ origin: '*' }),
+      })
+    );
+    expect(io).toBe(mockIo);
+  });
+
+  it('setupSocket 호출 → io.on("connection") 이벤트 등록', () => {
+    const httpServer = http.createServer();
+    setupSocket(httpServer);
+
+    expect(mockIo.on).toHaveBeenCalledWith('connection', expect.any(Function));
+  });
+
+  it('connection 이벤트 → join / disconnect 소켓 이벤트 등록', () => {
+    const httpServer = http.createServer();
+    setupSocket(httpServer);
+
+    // connection 핸들러 직접 실행
+    const connectionHandler = mockIo.on.mock.calls[0][1];
+    connectionHandler(mockSocket);
+
+    // socket.on이 'join', 'disconnect' 두 이벤트에 등록됐는지 확인
+    const registeredEvents = mockSocket.on.mock.calls.map((c: any[]) => c[0]);
+    expect(registeredEvents).toContain('join');
+    expect(registeredEvents).toContain('disconnect');
+  });
+
+  it('join 이벤트 → socket.join(`user_${userId}`) 호출', () => {
+    const httpServer = http.createServer();
+    setupSocket(httpServer);
+
+    const connectionHandler = mockIo.on.mock.calls[0][1];
+    connectionHandler(mockSocket);
+
+    // join 핸들러 직접 실행
+    const joinHandler = mockSocket.on.mock.calls.find((c: any[]) => c[0] === 'join')[1];
+    joinHandler(42);
+
+    expect(mockSocket.join).toHaveBeenCalledWith('user_42');
+  });
+});
+
+// ══════════════════════════════════════════════════════════════════
+describe('[Unit] emitNotification', () => {
+// ══════════════════════════════════════════════════════════════════
+
+  const notificationData = {
+    type: 'COMMENT',
+    message: '새 댓글이 달렸습니다.',
+    productId: 1,
+    createdAt: new Date(),
+  };
+
+  it('io가 있을 때 → io.to(`user_${userId}`).emit 호출', () => {
+    emitNotification(mockIo as any, 5, notificationData);
+
+    expect(mockTo).toHaveBeenCalledWith('user_5');
+    expect(mockEmit).toHaveBeenCalledWith('NEW_NOTIFICATION', notificationData);
+  });
+
+  it('userId가 문자열이어도 → io.to(`user_string`) 호출', () => {
+    emitNotification(mockIo as any, 'abc', notificationData);
+
+    expect(mockTo).toHaveBeenCalledWith('user_abc');
+    expect(mockEmit).toHaveBeenCalledWith('NEW_NOTIFICATION', notificationData);
+  });
+
+  it('io가 undefined이면 → emit 호출 안 함', () => {
+    emitNotification(undefined, 5, notificationData);
+
+    expect(mockTo).not.toHaveBeenCalled();
+    expect(mockEmit).not.toHaveBeenCalled();
+  });
+
+  it('알림 데이터가 올바르게 전달됨', () => {
+    const customData = { type: 'PRICE_CHANGE', message: '가격 변경됨', productId: 99, createdAt: new Date() };
+    emitNotification(mockIo as any, 7, customData);
+
+    expect(mockEmit).toHaveBeenCalledWith('NEW_NOTIFICATION', customData);
+  });
+});
